@@ -7,6 +7,7 @@ local lspconfig = require("lspconfig")
 -- list of all servers configured.
 lspconfig.servers = {
     "lua_ls",
+    "gopls",
     -- "clangd",
 }
 
@@ -54,6 +55,21 @@ lspconfig.lua_ls.setup({
                 maxPreload = 100000,
                 preloadFileSize = 10000,
             },
+        },
+    },
+})
+
+-- Setup gopls
+lspconfig.gopls.setup({
+    on_attach = on_attach,
+    on_init = on_init,
+    capabilities = capabilities,
+    settings = {
+        gopls = {
+            analyses = {
+                unusedparams = true,
+            },
+            staticcheck = true,
         },
     },
 })

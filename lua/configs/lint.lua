@@ -34,11 +34,22 @@ lint.linters.golangci_lint = {
 -- }
 
 -- Debug print
-vim.api.nvim_create_autocmd({ "BufWritePost" }, {
-    pattern = "*.go",
+-- vim.api.nvim_create_autocmd({ "BufWritePost", "BufEnter", "InsertLeave" }, {
+--     pattern = "*.go",
+--     callback = function()
+--         vim.fn.system("golangci-lint run --out-format line-number " .. vim.fn.expand("%"))
+--     end,
+-- })
+vim.api.nvim_create_autocmd({ "BufWritePost", "BufEnter", "InsertLeave" }, {
     callback = function()
-        print("Linting Go file...")
-        local result = vim.fn.system("golangci-lint run --out-format line-number " .. vim.fn.expand("%"))
-        print("golangci-lint output:", result)
+        local filetype = vim.bo.filetype
+        if filetype == "go" then
+            vim.fn.jobstart("golangci-lint run --out-format line-number " .. vim.fn.expand("%"), {
+                stdout_buffered = true,
+                stderr_buffered = true,
+            })
+        elseif filetype == "lua" then
+            lint.try_lint()
+        end
     end,
 })
